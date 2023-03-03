@@ -10,10 +10,10 @@ available in this [post](https://www.codeproject.com/Articles/114797/Polyline-Si
 
 ## Dependencies
 
-psimpl (header library) include in "include/lib"
-Qt 5.13
-OpenGL
-cmake
+* psimpl (header library) include in "include/lib"
+* Qt 5.13
+* OpenGL
+* cmake
 
 ## Running 
 
