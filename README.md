@@ -1,5 +1,7 @@
 # Ramer-Douglas-Peucker line simplification visualiser
 
+![screenshot](screenshot.png)
+
 The program loads a binary image, compute its contour 
 and interactively (change parameter) perform 
 Ramer-Douglas-Pecker simplification. 
