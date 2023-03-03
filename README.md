@@ -6,7 +6,7 @@ Ramer-Douglas-Pecker simplification.
 
 It includes a 3rd-party library (psimpl) for 
 Ramer-Douglas-Pecker implemetation. It is 
-available in this [https://www.codeproject.com/Articles/114797/Polyline-Simplification](post).
+available in this [post](https://www.codeproject.com/Articles/114797/Polyline-Simplification).
 
 ## Dependencies
 
