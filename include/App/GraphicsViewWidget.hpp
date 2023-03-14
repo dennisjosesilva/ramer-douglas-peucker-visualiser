@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "App/Renderer.hpp"
+#include <QKeyEvent>
 
 class MainWidget;
 
@@ -26,6 +27,9 @@ public:
   int npoints() const { return npoints_; }
 
   void loadImage(const QString &filename);
+
+  void keyPressEvent(QKeyEvent *e) override;
+  void keyReleaseEvent(QKeyEvent *e) override;
 
 protected:
   void initializeGL() override;

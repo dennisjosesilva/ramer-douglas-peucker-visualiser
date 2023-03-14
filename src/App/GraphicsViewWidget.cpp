@@ -62,22 +62,23 @@ void GraphicsViewWidget::loadImage(const QString &filename)
           bimg[y*img.width() + x] = true;
       }
     }
-
-    makeCurrent();
+    
     contour_ = extractContour(bimg, img.width(), img.height());
 
-    int HH = img.height() / 2;
-    int HW = img.width() / 2;
+    // int HH = img.height() / 2;
+    // int HW = img.width() / 2;
 
     // un-invert y-axis for rendering proposed.
     for (int i = 0; i < contour_.count(); i+=2) {
-      contour_[i] = HW + contour_[i];
-      contour_[i+1] = HH + (img.height() - contour_[i+1]);
+      contour_[i] = contour_[i];
+      contour_[i+1] = (img.height() - contour_[i+1]);
     }
 
     npoints_ = contour_.count() / 2;
     renderer_->setShowContour(true);
     renderer_->setShowSimpleContour(false);
+    makeCurrent();
+    glViewport(0, 0, img.width(), img.height());
     renderer_->setRendererSize(
       static_cast<float>(img.width()), static_cast<float>(img.height()));
     renderer_->updateContourBuffers(contour_);
@@ -86,8 +87,25 @@ void GraphicsViewWidget::loadImage(const QString &filename)
 
 void GraphicsViewWidget::paintGL()
 {
+  glViewport(0, 0, width(), height());
   gl_->glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   gl_->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   renderer_->draw();
+}
+
+  
+void GraphicsViewWidget::keyPressEvent(QKeyEvent *e)
+{
+  QOpenGLWidget::keyPressEvent(e);
+  makeCurrent();
+  renderer_->keyPressEvent(e);
+  update();
+}
+
+void GraphicsViewWidget::keyReleaseEvent(QKeyEvent *e)
+{
+  QOpenGLWidget::keyReleaseEvent(e);
+  renderer_->keyReleaseEvent(e);
+  update();
 }

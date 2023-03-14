@@ -11,6 +11,8 @@
 
 #include "App/Renderer.hpp"
 
+#include <QKeyEvent>
+
 class Renderer
 {
 public:
@@ -24,8 +26,14 @@ public:
 
   void setShowSimpleContour(bool val) { showSimpleContour_ = val; }
   void setShowContour(bool val) { showContour_ = val; }
+  
+  void zoomIn();
+  void zoomOut();
 
   void draw();
+
+  void keyPressEvent(QKeyEvent *e);
+  void keyReleaseEvent(QKeyEvent *e);
 
 private:
   // ==============================
@@ -60,4 +68,6 @@ private:
 
   bool showContour_;
   bool showSimpleContour_;
+
+  float zoom_;
 };

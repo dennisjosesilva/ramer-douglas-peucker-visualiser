@@ -2,13 +2,14 @@
 
 Renderer::Renderer(QOpenGLFunctions *gl, float width, float height)
   : gl_{gl}, width_{width}, height_{height}, 
-    showContour_{true}, showSimpleContour_{false}
+    showContour_{true}, showSimpleContour_{false},
+    zoom_{1.0f}
 {}
 
 void Renderer::setRendererSize(float width, float height)
 {
-  width_ = 600;
-  height_ = 600;
+  width_ = width;
+  height_ = height;
   updateProjectionMatrix();
 }
 
@@ -95,10 +96,11 @@ void Renderer::updateProjectionMatrix()
 {
   QMatrix4x4 proj;
 
-  qDebug() << width_ << " " << height_;
-
   proj.ortho(0.0f, width_, 0.0f, height_, -1.0f, 1.0f);
-  qDebug() << shaderProgram_.bind();
+  float oneMinusZoom = 1.0f - zoom_;
+  proj.translate(width_ * oneMinusZoom / 2.f, height_ * oneMinusZoom / 2.f);
+  proj.scale(zoom_);
+  shaderProgram_.bind();
   shaderProgram_.setUniformValue(uniProjection_, proj);
   shaderProgram_.release();
 }
@@ -134,3 +136,38 @@ void Renderer::draw()
   }
   
 }
+
+void Renderer::zoomIn()
+{
+    float portion = 0.10f;
+  if (zoom_ < 10.0f)
+    zoom_ += portion;
+  
+  updateProjectionMatrix();
+}
+
+void Renderer::zoomOut()
+{
+   float portion = 0.10f;
+  if (zoom_ > 0.10f)
+    zoom_ -= portion; 
+  
+  updateProjectionMatrix();
+}
+
+void Renderer::keyPressEvent(QKeyEvent *e)
+{
+  switch (e->key())
+  {
+  case Qt::Key_Plus:
+    zoomIn();
+    break;
+
+  case Qt::Key_Minus:
+    zoomOut();
+    break;
+  } 
+}
+
+void Renderer::keyReleaseEvent(QKeyEvent *e)
+{}

@@ -58,30 +58,44 @@ QVector<float> ContourExtractor::traceContour(
   const QVector<bool> &contourImg,
   const QPoint &p) const 
 {
-  QVector<bool> visited(contourImg.size(), false);
   QVector<float> contour;
-  visited[index(p)] = true;
-  
-  QPoint cp = p;
-  bool stop = false;
-  while(!stop) {
-    stop = true;
-    contour.append(static_cast<float>(cp.x()) + 0.5f);
-    contour.append(static_cast<float>(cp.y()) + 0.5f);
-    int cpidx = index(cp);
-    visited[cpidx] = true;
+  PointDir next = findNextPoint(contourImg, p, 0);
+  contour.append(static_cast<float>(next.p.x()) + 0.5f);
+  contour.append(static_cast<float>(next.p.y()) + 0.5f);
 
-    for (const QPoint &o : AdjE) {
-      QPoint q = cp + o;
-      int qidx = index(q);
-      if (imgContains(q) && contourImg[qidx] && !visited[qidx]) {
-        stop = false;
-        cp = q;
-        break;
-      }
+  QPoint start = p;
+  QPoint end = next.p;
+
+  QPoint prev = p;
+  QPoint cur = next.p;
+  bool done = (prev == cur);
+  while (!done) {
+    int dsearch = (next.dir + 6) % 8;
+    next = findNextPoint(contourImg, cur, dsearch);
+    prev = cur;
+    cur = next.p;
+    done = (prev == start && cur == end);
+    if (!done) {
+      contour.append(static_cast<float>(cur.x()) + 0.5f);
+      contour.append(static_cast<float>(cur.y()) + 0.5f);
     }
   }
+
   return contour;
+}
+
+ContourExtractor::PointDir 
+ContourExtractor::findNextPoint(const QVector<bool> &contourImg,
+  const QPoint &curPoint, int dir) const
+{
+  for (int i = 0; i < 7; i++) {
+    QPoint q = curPoint + AdjE[dir];
+    if (background(contourImg, q)) 
+      dir = (dir + 1) % 8;
+    else
+      return {q, dir};
+  }
+  return {curPoint, dir};
 }
 
 int ContourExtractor::index(const QPoint &p) const
@@ -95,6 +109,23 @@ int ContourExtractor::index(const QPoint &p) const
 QPoint ContourExtractor::point(int idx) const
 {
   return { idx % width_, idx / width_ };
+}
+
+bool ContourExtractor::foreground(const QPoint &p) const
+{
+  if (imgContains(p)) 
+    return bimg_[index(p)];
+  
+  return false;
+}
+
+bool ContourExtractor::foreground(const QVector<bool> &contourImg, 
+  const QPoint &p) const
+{
+  if (imgContains(p)) 
+    return contourImg[index(p)];
+
+  return false;
 }
 
 // =======================================================================
